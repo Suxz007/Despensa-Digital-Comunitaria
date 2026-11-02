@@ -36,7 +36,7 @@ const OPCIONES_EVALUACION = [
 const FEATURED_PRODUCTS = [
   {
     id: 101,
-    name: 'Aguacates Orgánicos del Caquetá',
+    name: 'Aguacates Orgánicos',
     category: 'Alimentos',
     price: '$ 12.000 / kg',
     unit: '/ kg',
