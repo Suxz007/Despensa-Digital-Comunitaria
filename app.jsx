@@ -180,10 +180,25 @@ function App() {
     }
   }, [catalogProducts]);
 
-  // 2. Método de validación (se ejecuta al iniciar la aplicación)
+  // 2. Método de validación y carga de productos desde la API (MySQL despensa)
   useEffect(() => {
     validarYCargarSesion();
+    cargarProductosDesdeAPI();
   }, []);
+
+  async function cargarProductosDesdeAPI() {
+    try {
+      const resp = await fetch(`${AUTH_API_URL}/api/productos`);
+      if (resp.ok) {
+        const datos = await resp.json();
+        if (Array.isArray(datos) && datos.length > 0) {
+          setCatalogProducts(datos);
+        }
+      }
+    } catch (e) {
+      console.warn('Conexión backend no disponible, usando catálogo local:', e);
+    }
+  }
 
   function validarYCargarSesion() {
     const params = new URLSearchParams(window.location.search);
@@ -228,19 +243,39 @@ function App() {
     window.scrollTo(0, 0);
   }
 
-  function handleAddProduct(newProd) {
+  async function handleAddProduct(newProd) {
+    const tempId = Date.now();
     const created = {
       ...newProd,
-      id: Date.now()
+      id: tempId
     };
-    setCatalogProducts([created, ...catalogProducts]);
+    setCatalogProducts(prev => [created, ...prev]);
     setView('productos');
     window.scrollTo(0, 0);
+
+    try {
+      const resp = await fetch(`${AUTH_API_URL}/api/productos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProd)
+      });
+      if (resp.ok) {
+        const guardado = await resp.json();
+        setCatalogProducts(prev => prev.map(p => p.id === tempId ? { ...p, ...guardado, id: guardado.id } : p));
+      }
+    } catch (e) {
+      console.warn('Producto guardado localmente, sincronización remota pendiente:', e);
+    }
   }
 
-  function handleDeleteProduct(id) {
+  async function handleDeleteProduct(id) {
     if (window.confirm('¿Eliminar este producto de la lista?')) {
-      setCatalogProducts(catalogProducts.filter(p => p.id !== id));
+      setCatalogProducts(prev => prev.filter(p => p.id !== id));
+      try {
+        await fetch(`${AUTH_API_URL}/api/productos/${id}`, { method: 'DELETE' });
+      } catch (e) {
+        console.warn('Error al eliminar en backend:', e);
+      }
     }
   }
 
@@ -486,6 +521,23 @@ function PublicNavbar({ active, isHome, onNavigate, showSearch, searchQuery, set
 function ProductCard({ product, onSelect, buttonColor = 'blue', showButton = true }) {
   function handleContactClick(e) {
     e.stopPropagation();
+    try {
+      fetch(`${AUTH_API_URL}/api/solicitudes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre_completo: sessionStorage.getItem('usuario') || 'Usuario Red Comunitaria',
+          telefono: '3100000000',
+          correo: 'comunidad@uniamazonia.edu.co',
+          tipo_solicitante: 'Comunidad Universitaria',
+          id_producto: product.id,
+          cantidad_solicitada: 1,
+          mensaje: `Interesado en ${product.name} (${product.price})`
+        })
+      });
+    } catch (err) {
+      console.warn('Registro de solicitud local:', err);
+    }
     const texto = encodeURIComponent(`Hola, me interesa el producto "${product.name}" (${product.price}) de la Red Comunitaria Uniamazonia.`);
     window.open(`https://wa.me/573100000000?text=${texto}`, '_blank');
   }

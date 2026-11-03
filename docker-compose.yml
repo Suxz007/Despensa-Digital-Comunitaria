@@ -17,7 +17,7 @@ services:
       - DB_PORT=3314
       - DB_USER=root
       - DB_PASSWORD=
-      - DB_NAME=bad9ojpsbsednmido0hy
+      - DB_NAME=despensa
       # Clave secreta para validación de tokens JWT
       - JWT_SECRET=clave-solo-para-pruebas
     volumes:

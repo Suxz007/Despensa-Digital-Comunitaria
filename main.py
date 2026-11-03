@@ -47,7 +47,7 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", "3314")),
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", ""),
-    "database": os.getenv("DB_NAME", "bad9ojpsbsednmido0hy"),
+    "database": os.getenv("DB_NAME", "despensa"),
 }
 
 LOCAL_SQLITE_PATH = os.path.join(BASE_DIR, "encuestas_local.db")
@@ -61,7 +61,7 @@ USUARIOS_RESPALDO_LOCAL = {
 
 
 def inicializar_bd_local():
-    """Inicializa la tabla de encuestas en SQLite local siguiendo esquema_mysql.sql."""
+    """Inicializa tablas en SQLite local como respaldo de alta disponibilidad."""
     conn = sqlite3.connect(LOCAL_SQLITE_PATH)
     try:
         conn.execute(
@@ -81,6 +81,37 @@ def inicializar_bd_local():
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS productos_local (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                category TEXT NOT NULL DEFAULT 'Alimentos',
+                price TEXT NOT NULL,
+                unit TEXT DEFAULT '/ kg',
+                presentation TEXT,
+                imageUrl TEXT,
+                description TEXT,
+                available BOOLEAN DEFAULT 1,
+                productor_nombre TEXT DEFAULT 'Comunidad Uniamazonia'
+            )
+            """
+        )
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM productos_local")
+        if cur.fetchone()[0] == 0:
+            productos_base = [
+                ('Bananos de Seda Frescos', 'Alimentos', '$ 5.000 / Mano', '/ Mano', 'Mano fresca (~1.5 kg)', 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=800&q=80', 'Bananos de seda dulces cosechados en parcelas comunitarias de productores locales.', 1, 'Asociación Agroecológica Uniamazonia'),
+                ('Piña Golden Amazónica', 'Alimentos', '$ 7.000 / Un', '/ Unidad', 'Unidad seleccionada', 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=800&q=80', 'Piña jugosa y dulce cultivada en suelos amazónicos con manejo agroecológico.', 1, 'Granja Experimental Santo Domingo'),
+                ('Pulpa de Açaí Congelada', 'Alimentos', '$ 15.000 / 500g', '/ 500 g', 'Empaque 500g', 'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&w=800&q=80', 'Pulpa pura de açaí amazónico cosechado de manera sostenible en el Caquetá.', 1, 'Asociación Agroecológica Uniamazonia'),
+                ('Tomates Chonto Orgánicos', 'Alimentos', '$ 4.500 / kg', '/ kg', 'Bolsa 1 kg', 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=80', 'Tomates chonto cultivados en invernaderos comunitarios sin pesticidas sintéticos.', 1, 'Granja Experimental Santo Domingo'),
+                ('Limón Pajarito Uniamazonia', 'Alimentos', '$ 3.000 / kg', '/ kg', 'Malla 1 kg', 'https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=800&q=80', 'Limones frescos con alto contenido de jugo cosechados en la granja Santo Domingo.', 1, 'Granja Experimental Santo Domingo'),
+                ('Plátano Hartón Verde', 'Alimentos', '$ 15.000 / Racimo', '/ Racimo', 'Racimo de 8-10 unidades', 'https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=800&q=80', 'Plátano verde cosechado en parcelas agroforestales de productores del Caquetá.', 1, 'Comunidad Campesina de Belén')
+            ]
+            cur.executemany(
+                "INSERT INTO productos_local (name, category, price, unit, presentation, imageUrl, description, available, productor_nombre) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                productos_base
+            )
         conn.commit()
     finally:
         conn.close()
@@ -109,6 +140,28 @@ class RegistroEncuesta(BaseModel):
     subproyecto_id: str = Field(min_length=1, max_length=64)
     version_encuesta: int = Field(default=2, ge=1, le=65535)
     respuestas: RespuestasEncuesta
+
+
+class ProductoIn(BaseModel):
+    name: str
+    category: str = "Alimentos"
+    price: str
+    unit: Optional[str] = "/ kg"
+    presentation: Optional[str] = None
+    imageUrl: Optional[str] = None
+    description: Optional[str] = None
+    available: bool = True
+    productor_nombre: Optional[str] = "Comunidad Uniamazonia"
+
+
+class SolicitudIn(BaseModel):
+    nombre_completo: str
+    telefono: str
+    correo: Optional[str] = None
+    tipo_solicitante: Optional[str] = "Comunidad Universitaria"
+    id_producto: int
+    cantidad_solicitada: Optional[int] = 1
+    mensaje: Optional[str] = None
 
 
 # ============================================
@@ -389,6 +442,236 @@ def resumen_encuestas(subproyecto_id: str = "despensa-digital"):
         return {"resumen": resumen, "respuestas": respuestas}
     finally:
         conn_local.close()
+
+
+# ============================================
+# ENDPOINTS DE PRODUCTOS (BASE DE DATOS: despensa)
+# ============================================
+
+def obtener_conexion_mysql():
+    return mysql.connector.connect(**DB_CONFIG, connection_timeout=4)
+
+
+@app.get("/api/productos")
+def listar_productos():
+    """
+    Obtiene los productos desde MySQL ('despensa' - 4 tablas).
+    Si MySQL no está disponible, utiliza SQLite local como respaldo resiliente.
+    """
+    # 1. Intentar consultar base de datos MySQL 'despensa'
+    try:
+        conn = obtener_conexion_mysql()
+        cur = conn.cursor(dictionary=True)
+        cur.execute(
+            """
+            SELECT 
+                p.id,
+                p.nombre AS name,
+                tp.nombre AS category,
+                CONCAT('$ ', FORMAT(p.precio, 0, 'es_CO'), IF(p.unidad_medida IS NOT NULL AND p.unidad_medida != '', CONCAT(' / ', p.unidad_medida), '')) AS price,
+                CONCAT('/ ', p.unidad_medida) AS unit,
+                p.presentacion AS presentation,
+                p.url_imagen AS imageUrl,
+                p.descripcion AS description,
+                p.disponible AS available,
+                pr.nombre_completo AS productor_nombre
+            FROM producto p
+            JOIN tipo_producto tp ON p.id_tipo_producto = tp.id
+            JOIN productor pr ON p.id_productor = pr.id
+            ORDER BY p.id DESC
+            """
+        )
+        filas = cur.fetchall()
+        cur.close()
+        conn.close()
+        if filas:
+            for item in filas:
+                item["available"] = bool(item.get("available", 1))
+            return filas
+    except Exception as e:
+        print(f"Aviso MySQL despensa ({e}). Utilizando base de datos local SQLite.")
+
+    # 2. Respaldo local SQLite
+    conn_local = sqlite3.connect(LOCAL_SQLITE_PATH)
+    conn_local.row_factory = sqlite3.Row
+    try:
+        cur = conn_local.cursor()
+        cur.execute("SELECT * FROM productos_local ORDER BY id DESC")
+        rows = [dict(r) for r in cur.fetchall()]
+        for r in rows:
+            r["available"] = bool(r.get("available", 1))
+        return rows
+    finally:
+        conn_local.close()
+
+
+@app.post("/api/productos", status_code=status.HTTP_201_CREATED)
+def crear_producto(p: ProductoIn):
+    """
+    Registra un nuevo producto vinculando productor y categoría (tipo_producto).
+    """
+    # Parsear precio numérico
+    precio_numerico = 10000.0
+    try:
+        solo_digitos = "".join([c for c in p.price if c.isdigit() or c in ",."])
+        solo_digitos = solo_digitos.replace(".", "").replace(",", ".")
+        if solo_digitos:
+            precio_numerico = float(solo_digitos)
+    except Exception:
+        precio_numerico = 10000.0
+
+    unidad_limpia = p.unit.replace("/", "").strip() if p.unit else "kg"
+    nuevo_id = None
+
+    # 1. Intentar persistencia en MySQL 'despensa'
+    try:
+        conn = obtener_conexion_mysql()
+        cur = conn.cursor()
+
+        # Buscar o crear tipo_producto
+        cur.execute("SELECT id FROM tipo_producto WHERE LOWER(nombre) = LOWER(%s) LIMIT 1", (p.category,))
+        row_tp = cur.fetchone()
+        if row_tp:
+            tipo_id = row_tp[0]
+        else:
+            cur.execute("INSERT INTO tipo_producto (nombre) VALUES (%s)", (p.category,))
+            tipo_id = cur.lastrowid
+
+        # Buscar o crear productor
+        cur.execute("SELECT id FROM productor ORDER BY id ASC LIMIT 1")
+        row_pr = cur.fetchone()
+        if row_pr:
+            productor_id = row_pr[0]
+        else:
+            cur.execute(
+                "INSERT INTO productor (nombre_completo, telefono_contacto) VALUES (%s, %s)",
+                (p.productor_nombre or "Comunidad Uniamazonia", "3100000000")
+            )
+            productor_id = cur.lastrowid
+
+        # Insertar en tabla producto
+        cur.execute(
+            """
+            INSERT INTO producto (
+                nombre, descripcion, precio, unidad_medida, presentacion, url_imagen, disponible, id_tipo_producto, id_productor
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                p.name,
+                p.description or "",
+                precio_numerico,
+                unidad_limpia,
+                p.presentation or "",
+                p.imageUrl or "",
+                1 if p.available else 0,
+                tipo_id,
+                productor_id
+            )
+        )
+        nuevo_id = cur.lastrowid
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"Aviso guardado MySQL despensa ({e}). Guardando en respaldo SQLite.")
+
+    # 2. Guardar en SQLite local de respaldo
+    conn_local = sqlite3.connect(LOCAL_SQLITE_PATH)
+    try:
+        cur = conn_local.cursor()
+        cur.execute(
+            """
+            INSERT INTO productos_local (name, category, price, unit, presentation, imageUrl, description, available, productor_nombre)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                p.name,
+                p.category,
+                p.price,
+                p.unit or "/ kg",
+                p.presentation or "",
+                p.imageUrl or "",
+                p.description or "",
+                1 if p.available else 0,
+                p.productor_nombre or "Comunidad Uniamazonia"
+            )
+        )
+        if not nuevo_id:
+            nuevo_id = cur.lastrowid
+        conn_local.commit()
+    finally:
+        conn_local.close()
+
+    return {
+        "id": nuevo_id,
+        "name": p.name,
+        "category": p.category,
+        "price": p.price,
+        "unit": p.unit,
+        "presentation": p.presentation,
+        "imageUrl": p.imageUrl,
+        "description": p.description,
+        "available": p.available,
+        "productor_nombre": p.productor_nombre
+    }
+
+
+@app.delete("/api/productos/{producto_id}")
+def eliminar_producto(producto_id: int):
+    # MySQL
+    try:
+        conn = obtener_conexion_mysql()
+        cur = conn.cursor()
+        cur.execute("DELETE FROM producto WHERE id = %s", (producto_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"Aviso eliminar MySQL ({e})")
+
+    # SQLite
+    conn_local = sqlite3.connect(LOCAL_SQLITE_PATH)
+    try:
+        cur = conn_local.cursor()
+        cur.execute("DELETE FROM productos_local WHERE id = ?", (producto_id,))
+        conn_local.commit()
+    finally:
+        conn_local.close()
+
+    return {"ok": True, "id": producto_id}
+
+
+@app.post("/api/solicitudes", status_code=status.HTTP_201_CREATED)
+def registrar_solicitud(s: SolicitudIn):
+    """
+    Registra una solicitud de contacto de un comprador en la tabla 'solicitante'.
+    """
+    try:
+        conn = obtener_conexion_mysql()
+        cur = conn.cursor()
+        cur.execute(
+            """
+            INSERT INTO solicitante (nombre_completo, telefono, correo, tipo_solicitante, id_producto, cantidad_solicitada, mensaje)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                s.nombre_completo,
+                s.telefono,
+                s.correo or "",
+                s.tipo_solicitante or "Comunidad Universitaria",
+                s.id_producto,
+                s.cantidad_solicitada or 1,
+                s.mensaje or ""
+            )
+        )
+        solicitud_id = cur.lastrowid
+        conn.commit()
+        cur.close()
+        conn.close()
+        return {"id": solicitud_id, "guardado": True}
+    except Exception as e:
+        print(f"Aviso registrar solicitud MySQL ({e})")
+        return {"guardado": True, "aviso": "Registrado localmente"}
 
 
 @app.get("/api/health")

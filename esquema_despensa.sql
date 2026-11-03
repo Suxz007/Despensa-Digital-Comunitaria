@@ -117,3 +117,4 @@ INSERT INTO `producto` (`nombre`, `descripcion`, `precio`, `unidad_medida`, `pre
 -- 4. Solicitante de ejemplo
 INSERT INTO `solicitante` (`nombre_completo`, `telefono`, `correo`, `tipo_solicitante`, `id_producto`, `cantidad_solicitada`, `mensaje`) VALUES
 ('Carlos Mendoza', '3151234567', 'carlos.mendoza@uniamazonia.edu.co', 'Docente', 1, 2, 'Buenas tardes, me interesa adquirir 2 kg de aguacate orgánico.');
+
