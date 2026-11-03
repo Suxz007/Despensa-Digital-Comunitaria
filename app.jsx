@@ -502,28 +502,42 @@ function PublicNavbar({
               <span>+ Agregar Producto</span>
             </button>
 
-            {usuario && (
-              <button
-                className="btn-outline-grey"
-                onClick={onCerrarSesion}
-                title={`Cerrar sesión de ${usuario}`}
-                style={{ padding: '6px 12px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16 17 21 12 16 7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                <span>Cerrar sesión</span>
-              </button>
-            )}
+            <button
+              className="btn-outline-grey"
+              onClick={onVolverDashboard}
+              title="Volver al panel central de Travesías"
+              style={{ padding: '8px 12px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>Volver al panel</span>
+            </button>
+
+            <button
+              className="btn-outline-grey"
+              onClick={onCerrarSesion}
+              title={usuario ? `Cerrar sesión de ${usuario}` : 'Cerrar sesión'}
+              style={{ padding: '8px 12px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', color: '#d32f2f', borderColor: '#f5c2c7' }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Cerrar sesión</span>
+            </button>
           </div>
 
-          {/* Botón hamburguesa para pantallas móviles / tablets */}
+          {/* Botón hamburguesa para abrir el menú lateral Travesías */}
           <button
             className="mobile-menu-btn"
             onClick={() => setDrawerOpen(true)}
             aria-label="Abrir menú"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="3" y1="6" x2="21" y2="6"></line>
