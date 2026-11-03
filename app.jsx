@@ -1,10 +1,8 @@
 const { useState, useEffect, useMemo } = React;
 
 // ============================================================================
-// 1. CONFIGURACIÓN DE URLS DEL SERVICIO CENTRAL (PLANTILLA OFICIAL TOKENS)
+// 1. CONFIGURACIÓN DEL SERVICIO
 // ============================================================================
-const LOGIN_CENTRAL_URL = 'plantilla_tokens/Frontend%20dos/login_dashboard.html';
-const DASHBOARD_CENTRAL_URL = 'plantilla_tokens/Frontend%20dos/dashboard.html';
 // Detección automática: en Docker (puerto 8090) usa ruta relativa; en desarrollo local usa puerto 8000
 const AUTH_API_URL = (window.location.port === '8090' || window.location.port === '80' || !window.location.port)
   ? ''
@@ -219,23 +217,6 @@ function App() {
     }
   }
 
-  // 3. Salida y navegación según la plantilla oficial del coordinador
-  function irAlLoginCentral() {
-    window.location.href = LOGIN_CENTRAL_URL;
-  }
-
-  function cerrarSesion() {
-    sessionStorage.clear();
-    setUsuarioFinal(null);
-    setTokenFinal(null);
-    setSesionValida(false);
-    window.location.href = LOGIN_CENTRAL_URL;
-  }
-
-  function volverAlDashboard() {
-    window.location.href = DASHBOARD_CENTRAL_URL;
-  }
-
   function handleOpenDetail(product) {
     setSelectedProduct(product);
     setView('detalle');
@@ -243,14 +224,6 @@ function App() {
   }
 
   function handleNavigate(targetView) {
-    if (targetView === 'login') {
-      irAlLoginCentral();
-      return;
-    }
-    if ((targetView === 'admin' || targetView === 'adminNuevo') && !sesionValida) {
-      irAlLoginCentral();
-      return;
-    }
     setView(targetView);
     window.scrollTo(0, 0);
   }
@@ -261,7 +234,8 @@ function App() {
       id: Date.now()
     };
     setCatalogProducts([created, ...catalogProducts]);
-    setView('admin');
+    setView('productos');
+    window.scrollTo(0, 0);
   }
 
   function handleDeleteProduct(id) {
@@ -279,8 +253,6 @@ function App() {
             active="home"
             isHome={true}
             onNavigate={handleNavigate}
-            sesionValida={sesionValida}
-            usuario={usuarioFinal}
           />
           <HomeView
             featuredProducts={FEATURED_PRODUCTS}
@@ -299,8 +271,6 @@ function App() {
           <PublicNavbar
             active="productos"
             onNavigate={handleNavigate}
-            sesionValida={sesionValida}
-            usuario={usuarioFinal}
             showSearch={true}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -309,6 +279,7 @@ function App() {
             products={catalogProducts}
             searchQuery={searchQuery}
             onSelectProduct={handleOpenDetail}
+            onNavigate={handleNavigate}
           />
           <WhatsappFab />
         </>
@@ -319,8 +290,6 @@ function App() {
           <PublicNavbar
             active="productos"
             onNavigate={handleNavigate}
-            sesionValida={sesionValida}
-            usuario={usuarioFinal}
           />
           <DetailView
             product={selectedProduct}
@@ -337,16 +306,10 @@ function App() {
           <PublicNavbar
             active="encuesta"
             onNavigate={handleNavigate}
-            sesionValida={sesionValida}
-            usuario={usuarioFinal}
           />
           <EncuestaUsabilidadView
             subproyectoId={SUBPROYECTO_ID}
             nombreSubproyecto={SUBPROYECTO_NOMBRE}
-            token={tokenFinal}
-            usuario={usuarioFinal}
-            sesionValida={sesionValida}
-            onIrLogin={irAlLoginCentral}
             onCancelar={() => handleNavigate('home')}
           />
           <Footer onNavigate={handleNavigate} />
@@ -357,13 +320,10 @@ function App() {
       {(view === 'admin' || view === 'adminNuevo' || view === 'adminEncuestas') && (
         <AdminView
           mode={view}
-          usuario={usuarioFinal || 'Administrador'}
           products={catalogProducts}
           onNavigate={handleNavigate}
           onDelete={handleDeleteProduct}
           onSaveProduct={handleAddProduct}
-          onVolverDashboard={volverAlDashboard}
-          onCerrarSesion={cerrarSesion}
         />
       )}
     </div>
@@ -381,7 +341,7 @@ function TopBanner() {
   );
 }
 
-function PublicNavbar({ active, isHome, onNavigate, sesionValida, usuario, showSearch, searchQuery, setSearchQuery }) {
+function PublicNavbar({ active, isHome, onNavigate, showSearch, searchQuery, setSearchQuery }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
@@ -436,23 +396,17 @@ function PublicNavbar({ active, isHome, onNavigate, sesionValida, usuario, showS
               </div>
             )}
 
-            {sesionValida ? (
-              <button className="btn-outline-green" onClick={() => onNavigate('admin')}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span>Panel ({usuario})</span>
-              </button>
-            ) : (
-              <button className="btn-outline-green" onClick={() => onNavigate('login')}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span>Iniciar Sesión</span>
-              </button>
-            )}
+            <button
+              className="btn-outline-green"
+              onClick={() => onNavigate('adminNuevo')}
+              title="Publicar un nuevo producto"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>+ Agregar Producto</span>
+            </button>
           </div>
 
           {/* Botón hamburguesa para pantallas móviles / tablets */}
@@ -502,6 +456,12 @@ function PublicNavbar({ active, isHome, onNavigate, sesionValida, usuario, showS
               <span>📦</span> Productos
             </button>
             <button
+              className="drawer-item"
+              onClick={() => { setDrawerOpen(false); onNavigate('adminNuevo'); }}
+            >
+              <span>➕</span> Agregar Producto
+            </button>
+            <button
               className={`drawer-item ${active === 'encuesta' ? 'active' : ''}`}
               onClick={() => { setDrawerOpen(false); onNavigate('encuesta'); }}
             >
@@ -509,9 +469,9 @@ function PublicNavbar({ active, isHome, onNavigate, sesionValida, usuario, showS
             </button>
             <button
               className="drawer-item"
-              onClick={() => { setDrawerOpen(false); onNavigate(sesionValida ? 'admin' : 'login'); }}
+              onClick={() => { setDrawerOpen(false); onNavigate('admin'); }}
             >
-              <span>👤</span> {sesionValida ? `Panel (${usuario})` : 'Iniciar Sesión'}
+              <span>⚙️</span> Gestión de Productos
             </button>
           </div>
         </div>
@@ -692,7 +652,7 @@ function FilterPanel({ selectedCats, onToggleCat, onlyAvailable, onToggleAvailab
 // ============================================================================
 // VISTA 2: CATÁLOGO DE PRODUCTOS (IDÉNTICO A LA CAPTURA DE PANTALLA)
 // ============================================================================
-function ProductsView({ products, searchQuery, onSelectProduct }) {
+function ProductsView({ products, searchQuery, onSelectProduct, onNavigate }) {
   // Por defecto "Alimentos" seleccionado igual que en Flutter: selected = {'Alimentos'}
   const [selectedCats, setSelectedCats] = useState(['Alimentos']);
   const [onlyAvailable, setOnlyAvailable] = useState(true);
@@ -751,7 +711,13 @@ function ProductsView({ products, searchQuery, onSelectProduct }) {
           </svg>
           <span>Filtrar y Ordenar</span>
         </button>
-        <span style={{ fontSize: '12px', color: 'var(--muted)' }}>{filtered.length} productos</span>
+        <button
+          className="btn-green"
+          onClick={() => onNavigate && onNavigate('adminNuevo')}
+          style={{ padding: '6px 12px', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+        >
+          <span>+ Agregar Producto</span>
+        </button>
       </div>
 
       <div className="centered catalog-desktop">
@@ -771,16 +737,29 @@ function ProductsView({ products, searchQuery, onSelectProduct }) {
         <section className="catalog-main">
           <div className="catalog-toolbar-desktop">
             <span style={{ color: 'var(--muted)', fontSize: '15px' }}>{resultsText}</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ color: 'var(--muted)', fontSize: '14px' }}>Ordenar por:</span>
-              <select
-                className="sort-dropdown"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <button
+                className="btn-green"
+                onClick={() => onNavigate && onNavigate('adminNuevo')}
+                style={{ height: '38px', padding: '0 16px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
-                <option value="Más recientes">Más recientes</option>
-                <option value="Nombre (A-Z)">Nombre (A-Z)</option>
-              </select>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>+ Agregar Producto</span>
+              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--muted)', fontSize: '14px' }}>Ordenar por:</span>
+                <select
+                  className="sort-dropdown"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="Más recientes">Más recientes</option>
+                  <option value="Nombre (A-Z)">Nombre (A-Z)</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -944,7 +923,7 @@ function DetailView({ product, relatedProducts, onBack, onSelectProduct }) {
 // ============================================================================
 // VISTA ENCUESTA DE USABILIDAD (ESTANDARIZADA TRAVESÍAS V2 CON CARITAS)
 // ============================================================================
-function EncuestaUsabilidadView({ subproyectoId, nombreSubproyecto, token, usuario, sesionValida, onIrLogin, onCancelar }) {
+function EncuestaUsabilidadView({ subproyectoId, nombreSubproyecto, onCancelar }) {
   const [respuestas, setRespuestas] = useState({});
   const [enviando, setEnviando] = useState(false);
   const [enviada, setEnviada] = useState(false);
@@ -961,11 +940,7 @@ function EncuestaUsabilidadView({ subproyectoId, nombreSubproyecto, token, usuar
   async function handleEnviar() {
     if (enviando || enviada || completadas !== 5) return;
 
-    const tokenActual = token || sessionStorage.getItem('access_token') || sessionStorage.getItem('token');
-    if (!tokenActual) {
-      setError('Tu sesión no está disponible. Inicia sesión en el portal central para enviar tu encuesta.');
-      return;
-    }
+    const tokenActual = sessionStorage.getItem('access_token') || sessionStorage.getItem('token') || 'token-comunitario-local';
 
     setEnviando(true);
     setError(null);
@@ -999,11 +974,7 @@ function EncuestaUsabilidadView({ subproyectoId, nombreSubproyecto, token, usuar
       }
 
       const data = await res.json().catch(() => ({}));
-      if (res.status === 401) {
-        setError('Tu sesión expiró. Inicia sesión nuevamente en el portal central.');
-      } else if (res.status === 403) {
-        setError('No tienes acceso a este subproyecto.');
-      } else if (res.status === 409) {
+      if (res.status === 409) {
         setError('Ya respondiste esta versión de la encuesta en este subproyecto.');
       } else if (res.status === 422) {
         setError('Las respuestas enviadas no son válidas.');
@@ -1011,7 +982,7 @@ function EncuestaUsabilidadView({ subproyectoId, nombreSubproyecto, token, usuar
         setError(data.detail || 'No se pudieron guardar tus respuestas. Inténtalo más tarde.');
       }
     } catch (e) {
-      setError('No fue posible conectar con el servidor de encuestas (Puerto 8000).');
+      setError('No fue posible conectar con el servidor de encuestas.');
     } finally {
       setEnviando(false);
     }
@@ -1071,34 +1042,7 @@ function EncuestaUsabilidadView({ subproyectoId, nombreSubproyecto, token, usuar
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', fontSize: '14px', color: '#212529', flexWrap: 'wrap' }}>
               <span style={{ color: '#0085CA', fontWeight: 700 }}>❖</span>
               <span>Subproyecto: <strong>{nombreSubproyecto || subproyectoId}</strong></span>
-              {sesionValida && usuario && (
-                <span style={{ marginLeft: 'auto', background: '#E2F2E8', color: '#007A33', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 600 }}>
-                  Sesión activa: {usuario}
-                </span>
-              )}
             </div>
-
-            {!sesionValida && (
-              <div style={{
-                background: '#FFF3CD',
-                border: '1px solid #FFECB5',
-                borderRadius: '12px',
-                padding: '14px 16px',
-                marginBottom: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '12px',
-                flexWrap: 'wrap'
-              }}>
-                <span style={{ fontSize: '14px', color: '#664D03' }}>
-                  Para registrar tu respuesta en la base de datos necesitas tener sesión iniciada en el Portal Central.
-                </span>
-                <button className="btn-green" onClick={onIrLogin} style={{ padding: '8px 14px', fontSize: '13px' }}>
-                  Iniciar sesión
-                </button>
-              </div>
-            )}
 
             {/* Tarjeta de progreso */}
             <div style={{
@@ -1242,9 +1186,9 @@ function EncuestaUsabilidadView({ subproyectoId, nombreSubproyecto, token, usuar
 }
 
 // ============================================================================
-// VISTA 4: PANEL ADMINISTRATIVO DE PRODUCTORES
+// VISTA 4: PANEL DE GESTIÓN Y AGREGAR PRODUCTO
 // ============================================================================
-function AdminView({ mode, usuario, products, onNavigate, onDelete, onSaveProduct, onVolverDashboard, onCerrarSesion }) {
+function AdminView({ mode, products, onNavigate, onDelete, onSaveProduct }) {
   const [query, setQuery] = useState('');
   const [catFilter, setCatFilter] = useState('Todas');
   const [statusFilter, setStatusFilter] = useState('Todos');
@@ -1283,17 +1227,17 @@ function AdminView({ mode, usuario, products, onNavigate, onDelete, onSaveProduc
   return (
     <div>
       <header className="admin-navbar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => onNavigate('home')}>
           <div className="brand-logo-box" style={{ width: '38px', height: '38px' }}>
             <img src="assets/images/logo_red_comunitaria.jpg" alt="Logo" />
           </div>
           <span className="font-mont" style={{ fontSize: '16px', fontWeight: 700 }}>
-            Panel Administrativo
+            Despensa Digital · Gestión
           </span>
         </div>
 
-        <span style={{ background: 'var(--admin-badge)', padding: '5px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 600 }}>
-          {usuario}
+        <span style={{ background: 'var(--admin-badge)', color: '#fff', padding: '5px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 600 }}>
+          Comunidad Uniamazonia
         </span>
       </header>
 
@@ -1303,13 +1247,16 @@ function AdminView({ mode, usuario, products, onNavigate, onDelete, onSaveProduc
             className={`admin-nav-btn ${mode === 'admin' ? 'active' : ''}`}
             onClick={() => onNavigate('admin')}
           >
-            📦 Productos
+            📦 Lista de Productos
           </button>
           <button
             className={`admin-nav-btn ${mode === 'adminNuevo' ? 'active' : ''}`}
             onClick={() => onNavigate('adminNuevo')}
           >
-            ➕ Nuevo Producto
+            ➕ Agregar Producto
+          </button>
+          <button className="admin-nav-btn" onClick={() => onNavigate('productos')}>
+            🏪 Ver Catálogo
           </button>
           <button
             className={`admin-nav-btn ${mode === 'adminEncuestas' ? 'active' : ''}`}
@@ -1318,20 +1265,10 @@ function AdminView({ mode, usuario, products, onNavigate, onDelete, onSaveProduc
             📊 Resultados Encuesta
           </button>
           <button className="admin-nav-btn" onClick={() => onNavigate('encuesta')}>
-            📝 Ver Encuesta
+            📝 Ir a Encuesta
           </button>
           <button className="admin-nav-btn" onClick={() => onNavigate('home')}>
-            🏪 Ver Catálogo
-          </button>
-          <button className="admin-nav-btn" onClick={onVolverDashboard}>
-            ⬅️ Dashboard Central
-          </button>
-          <button
-            className="admin-nav-btn"
-            style={{ color: 'var(--danger)' }}
-            onClick={onCerrarSesion}
-          >
-            🚪 Cerrar Sesión
+            🏠 Ir a Inicio
           </button>
         </aside>
 
@@ -1497,7 +1434,7 @@ function AdminView({ mode, usuario, products, onNavigate, onDelete, onSaveProduc
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
-                  <button type="button" className="btn-outline-grey" onClick={() => onNavigate('admin')}>
+                  <button type="button" className="btn-outline-grey" onClick={() => onNavigate('productos')}>
                     Cancelar
                   </button>
                   <button type="submit" className="btn-green">
