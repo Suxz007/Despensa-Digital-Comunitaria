@@ -665,9 +665,6 @@ function PublicNavbar({
     </>
   );
 }
-    </>
-  );
-}
 
 // ============================================================================
 // TARJETA DE PRODUCTO (IDÉNTICA A LA CAPTURA DE FLUTTER)
