@@ -21,6 +21,8 @@ services:
       # Clave secreta para validación de tokens JWT
       - JWT_SECRET=clave-solo-para-pruebas
     volumes:
+      # Montaje del código en vivo para que los cambios se reflejen sin demoras
+      - ./:/app
       # Persistencia de la base de datos local SQLite para encuestas
       - ./encuestas_local.db:/app/encuestas_local.db
     healthcheck:
