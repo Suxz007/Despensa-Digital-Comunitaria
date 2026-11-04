@@ -163,7 +163,6 @@ function App() {
             onSelectProduct={handleOpenDetail}
           />
           <Footer onNavigate={handleNavigate} />
-          <WhatsappFab />
         </>
       )}
 
@@ -181,7 +180,6 @@ function App() {
             onNavigate={handleNavigate}
           />
           <Footer onNavigate={handleNavigate} />
-          <WhatsappFab />
         </>
       )}
 
@@ -200,7 +198,6 @@ function App() {
             onBack={() => handleNavigate('home')}
             onSelectProduct={handleOpenDetail}
           />
-          <WhatsappFab />
         </>
       )}
 
@@ -219,7 +216,6 @@ function App() {
             onCancelar={() => handleNavigate('home')}
           />
           <Footer onNavigate={handleNavigate} />
-          <WhatsappFab />
         </>
       )}
 
@@ -236,7 +232,6 @@ function App() {
             <AdminEncuestasPanel subproyectoId={SUBPROYECTO_ID} onNavigate={handleNavigate} />
           </main>
           <Footer onNavigate={handleNavigate} />
-          <WhatsappFab />
         </>
       )}
 
