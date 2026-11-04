@@ -115,6 +115,28 @@ const INITIAL_CATALOG_PRODUCTS = [
     imageUrl: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?auto=format&fit=crop&w=800&q=80',
     description: 'Huevos semicriollos de gallinas criadas en pastoreo libre en granjas locales.'
   },
+  {
+    id: 7,
+    name: 'Queso Caqueteño Artesanal',
+    category: 'Alimentos',
+    price: '$ 14.000 / lb',
+    unit: '/ Libra',
+    available: true,
+    presentation: 'Bloque de 500g empacado al vacío',
+    imageUrl: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=800&q=80',
+    description: 'Queso fresco con denominación de origen caqueteño elaborado por familias ganaderas sostenibles.'
+  },
+  {
+    id: 8,
+    name: 'Panela Pulverizada Orgánica',
+    category: 'Agricultura',
+    price: '$ 6.500 / kg',
+    unit: '/ kg',
+    available: true,
+    presentation: 'Bolsa ecológica por 1 kg',
+    imageUrl: 'https://images.unsplash.com/photo-1581441363689-1f3c3c414635?auto=format&fit=crop&w=800&q=80',
+    description: 'Panela 100% natural libre de químicos, producida en trapiches comunitarios del piedemonte amazónico.'
+  },
   ...FEATURED_PRODUCTS
 ];
 

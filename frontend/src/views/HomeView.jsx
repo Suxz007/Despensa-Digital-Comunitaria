@@ -1,57 +1,53 @@
 // ============================================================================
-// VISTA 1: INICIO
+// VISTA 1: INICIO (SOLO PRODUCTOS CON PAGINACIÓN 1, 2, 3)
 // ============================================================================
-function HomeView({ featuredProducts, searchQuery, setSearchQuery, onExplore, onSelectProduct }) {
+function HomeView({ products = [], onSelectProduct }) {
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 4;
+
+  // Combinar productos recibidos con el catálogo completo si el backend devolvió pocos
+  const fullList = useMemo(() => {
+    const base = Array.isArray(products) && products.length > 0 ? products : INITIAL_CATALOG_PRODUCTS;
+    if (base.length >= 12) return base;
+    const ids = new Set(base.map(p => p.id));
+    const extras = INITIAL_CATALOG_PRODUCTS.filter(p => !ids.has(p.id));
+    return [...base, ...extras];
+  }, [products]);
+
+  const paginatedProducts = useMemo(() => {
+    const start = (page - 1) * itemsPerPage;
+    return fullList.slice(start, start + itemsPerPage);
+  }, [fullList, page]);
+
+  function handlePageChange(p) {
+    setPage(p);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   return (
-    <main>
-      <section className="hero">
-        <div className="hero-overlay"></div>
-        <div className="centered hero-content">
-          <h1 className="hero-title">Marketplace Comunitario Travesias</h1>
-          <p className="hero-sub">
-            Conectamos productores locales, estudiantes y egresados con toda la comunidad universitaria. Compra fresco, apoya lo local.
-          </p>
-          <div className="hero-search-row">
-            <div className="hero-search-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6C757D" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input
-                type="text"
-                placeholder="Buscar productos frescos, artesanías..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && onExplore()}
-              />
-            </div>
-            <button className="btn-blue" onClick={onExplore}>
-              Explorar Productos
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="centered" style={{ paddingTop: '56px', paddingBottom: '80px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
-          <h2 className="font-mont" style={{ fontSize: '28px', fontWeight: 700 }}>Productos Destacados</h2>
-          <button
-            onClick={onExplore}
-            style={{ background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
-          >
-            <span>Ver todos los productos</span>
-            <span>→</span>
-          </button>
-        </div>
-
+    <main style={{ flex: 1 }}>
+      <section className="centered" style={{ paddingTop: '40px', paddingBottom: '64px' }}>
         <div className="products-grid-home">
-          {featuredProducts.map(product => (
+          {paginatedProducts.map(product => (
             <ProductCard
               key={product.id}
               product={product}
               buttonColor="green"
               onSelect={() => onSelectProduct(product)}
             />
+          ))}
+        </div>
+
+        {/* Paginación circular 1, 2, 3 para cambiar los productos */}
+        <div className="pagination-row" style={{ marginTop: '36px' }}>
+          {[1, 2, 3].map(p => (
+            <button
+              key={p}
+              className={`page-circle ${page === p ? 'active' : ''}`}
+              onClick={() => handlePageChange(p)}
+            >
+              {p}
+            </button>
           ))}
         </div>
       </section>

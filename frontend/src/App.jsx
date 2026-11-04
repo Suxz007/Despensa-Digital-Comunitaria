@@ -116,7 +116,7 @@ function App() {
       id: tempId
     };
     setCatalogProducts(prev => [created, ...prev]);
-    setView('productos');
+    setView('home');
     window.scrollTo(0, 0);
 
     try {
@@ -159,10 +159,7 @@ function App() {
             onCerrarSesion={cerrarSesion}
           />
           <HomeView
-            featuredProducts={FEATURED_PRODUCTS}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            onExplore={() => handleNavigate('productos')}
+            products={catalogProducts}
             onSelectProduct={handleOpenDetail}
           />
           <Footer onNavigate={handleNavigate} />
@@ -180,11 +177,10 @@ function App() {
             onCerrarSesion={cerrarSesion}
           />
           <ProductsView
-            products={catalogProducts}
-            searchQuery={searchQuery}
-            onSelectProduct={handleOpenDetail}
+            onSaveProduct={handleAddProduct}
             onNavigate={handleNavigate}
           />
+          <Footer onNavigate={handleNavigate} />
           <WhatsappFab />
         </>
       )}
@@ -192,7 +188,7 @@ function App() {
       {view === 'detalle' && (
         <>
           <PublicNavbar
-            active="productos"
+            active="home"
             onNavigate={handleNavigate}
             usuario={usuarioFinal}
             onVolverDashboard={volverAlDashboard}
@@ -201,7 +197,7 @@ function App() {
           <DetailView
             product={selectedProduct}
             relatedProducts={FEATURED_PRODUCTS.slice(0, 3)}
-            onBack={() => handleNavigate('productos')}
+            onBack={() => handleNavigate('home')}
             onSelectProduct={handleOpenDetail}
           />
           <WhatsappFab />
