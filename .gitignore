@@ -1,21 +1,17 @@
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-
-# Virtual environments
-venv/
 .venv/
-env/
+venv/
 
-# IDEs
+# Secretos
+.env
+
+# Base de datos local (se crea sola al arrancar el backend)
+backend/data/*.db
+
+# IDEs / sistema
 .vscode/
 .idea/
-
-# OS generated
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
 .DS_Store
-
+Thumbs.db

@@ -1,34 +1,23 @@
-version: '3.8'
-
 services:
-  despensa-digital:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: despensa_digital_comunitaria
+  backend:
+    build: ./backend
+    container_name: despensa_backend
     restart: unless-stopped
-    ports:
-      # Puerto oficial del subproyecto Despensa Digital Comunitaria
-      - "8090:8090"
-    environment:
-      - PORT=8090
-      # Configuración de base de datos MySQL (remota / VPN institucional)
-      - DB_HOST=100.79.246.82
-      - DB_PORT=3314
-      - DB_USER=root
-      - DB_PASSWORD=
-      - DB_NAME=despensa
-      # Clave secreta para validación de tokens JWT
-      - JWT_SECRET=clave-solo-para-pruebas
+    env_file:
+      - path: ./backend/.env
+        required: false      # si no existe, se usan los valores por defecto del código
     volumes:
-      # Montaje del código en vivo para que los cambios se reflejen sin demoras
-      - ./:/app
-      # Persistencia de la base de datos local SQLite para encuestas
-      - ./encuestas_local.db:/app/encuestas_local.db
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8090/api/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+      # Guarda la base SQLite local (respaldo) fuera del contenedor
+      - ./backend/data:/app/data
+    expose:
+      - "8000"
 
+  frontend:
+    build: ./frontend
+    container_name: despensa_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      # Puerto oficial del subproyecto: http://localhost:8090
+      - "8090:80"
