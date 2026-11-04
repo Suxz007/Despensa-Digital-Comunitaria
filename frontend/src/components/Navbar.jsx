@@ -104,8 +104,16 @@ function PublicNavbar({
 
       {/* Menú lateral desplegable a la derecha (Drawer) */}
       {drawerOpen && (
-        <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)}>
-          <div className="drawer-panel" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="drawer-backdrop"
+          style={{ justifyContent: 'flex-end' }}
+          onClick={() => setDrawerOpen(false)}
+        >
+          <div
+            className="drawer-panel"
+            style={{ marginLeft: 'auto', boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.15)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="drawer-header">
               <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div className="brand-logo-box" style={{ width: '36px', height: '36px' }}>
