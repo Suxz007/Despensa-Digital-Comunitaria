@@ -25,6 +25,16 @@ app.include_router(solicitudes.router)
 app.include_router(health.router)
 
 
+@app.get("/")
+def raiz():
+    return {
+        "servicio": "Despensa Digital Comunitaria - Travesías",
+        "estado": "activo",
+        "documentacion": "/docs",
+        "health": "/api/health"
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
 
