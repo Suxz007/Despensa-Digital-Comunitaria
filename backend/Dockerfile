@@ -2,7 +2,12 @@ FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PORT=9099
+    PORT=9099 \
+    DB_HOST=100.79.246.82 \
+    DB_PORT=3314 \
+    DB_USER=root \
+    DB_PASSWORD=admin \
+    DB_NAME=despensa
 
 WORKDIR /app
 

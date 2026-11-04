@@ -1,13 +1,21 @@
+# Etapa 1: Compilación con Node.js
+FROM node:20-alpine AS build
+WORKDIR /app
+
+# Copiar archivos de dependencias e instalarlas
+COPY package*.json ./
+RUN npm install
+
+# Copiar el código fuente y compilar la carpeta dist
+COPY . .
+RUN npm run build
+
+# Etapa 2: Servidor Web Nginx
 FROM nginx:alpine
 
-# Copiar la configuración de Nginx (puerto 8090 y proxy a 9099)
+# Copiar la configuración de Nginx y los archivos compilados en la etapa anterior
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copiar el código fuente del frontend
-COPY index.html /usr/share/nginx/html/
-COPY src /usr/share/nginx/html/src
-COPY styles /usr/share/nginx/html/styles
-COPY assets /usr/share/nginx/html/assets
+COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 8090
 

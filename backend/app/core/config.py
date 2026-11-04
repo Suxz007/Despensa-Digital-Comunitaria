@@ -30,7 +30,7 @@ DB_CONFIG = {
     "host": os.getenv("DB_HOST", "100.79.246.82"),
     "port": int(os.getenv("DB_PORT", "3314")),
     "user": os.getenv("DB_USER", "root"),
-    "password": os.getenv("DB_PASSWORD", ""),
+    "password": os.getenv("DB_PASSWORD", "admin"),
     "database": os.getenv("DB_NAME", "despensa"),
 }
 

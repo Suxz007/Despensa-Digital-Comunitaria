@@ -1,0 +1,9 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: despensa-frontend
+    restart: unless-stopped
+    ports:
+      - "8090:8090"

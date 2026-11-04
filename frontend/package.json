@@ -1,0 +1,10 @@
+{
+  "name": "despensa-digital-frontend",
+  "version": "1.0.0",
+  "description": "Frontend de Despensa Digital Comunitaria - Travesías",
+  "scripts": {
+    "build": "node -e \"const fs=require('fs'); fs.mkdirSync('dist',{recursive:true}); ['index.html','src','styles','assets'].forEach(p=>fs.cpSync(p,'dist/'+p,{recursive:true}));\"",
+    "dev": "npx serve -s . -l 8090",
+    "start": "npx serve -s . -l 8090"
+  }
+}
