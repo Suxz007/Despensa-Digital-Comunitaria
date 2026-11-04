@@ -47,14 +47,14 @@ Terminal 1 – backend:
 ```bash
 cd backend
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --port 9099
 ```
 Terminal 2 – frontend:
 ```bash
 cd frontend
-python -m http.server 5500
+python -m http.server 8090
 ```
-Abrir: <http://localhost:5500> (el frontend detecta solo que debe llamar al backend en el puerto 8000).
+Abrir: <http://localhost:8090> (el frontend detecta solo que debe llamar al backend en el puerto 9099).
 
 ## Dónde cambiar cada cosa
 | Quiero… | Archivo |

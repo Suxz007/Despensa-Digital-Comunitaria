@@ -1,4 +1,4 @@
-"""Punto de entrada de la API. Arrancar con:  uvicorn app.main:app --port 8000"""
+"""Punto de entrada de la API. Arrancar con:  uvicorn app.main:app --port 9099"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 

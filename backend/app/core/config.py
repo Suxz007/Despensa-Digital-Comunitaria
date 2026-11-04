@@ -46,4 +46,4 @@ USUARIOS_RESPALDO_LOCAL = {
     "estudiante": {"credenciales": "Estudiante123", "estado": "comunidad"},
 }
 
-PORT = int(os.getenv("PORT", 8000))
+PORT = int(os.getenv("PORT", 9099))

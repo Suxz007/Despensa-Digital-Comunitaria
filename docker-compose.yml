@@ -6,11 +6,16 @@ services:
     env_file:
       - path: ./backend/.env
         required: false      # si no existe, se usan los valores por defecto del código
+    environment:
+      - PORT=9099
     volumes:
       # Guarda la base SQLite local (respaldo) fuera del contenedor
       - ./backend/data:/app/data
+    ports:
+      # Puerto oficial backend: 9099
+      - "9099:9099"
     expose:
-      - "8000"
+      - "9099"
 
   frontend:
     build: ./frontend

@@ -19,7 +19,7 @@ function AdminEncuestasPanel({ subproyectoId, onNavigate }) {
       const json = await res.json();
       setDatos(json);
     } catch (e) {
-      setError('No se pudo conectar con la API de encuestas en el puerto 8000.');
+      setError('No se pudo conectar con la API de encuestas en el puerto 9099.');
     } finally {
       setCargando(false);
     }
