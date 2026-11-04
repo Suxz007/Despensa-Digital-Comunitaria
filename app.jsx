@@ -205,14 +205,14 @@ function App() {
     const usuarioUrl = params.get('usuario');
     let tokenUrl = params.get('token');
 
-    // Detectar y guardar URL del panel central o login si vino como referrer
+    // Detectar y guardar URL del panel central o login si vino como referrer (puerto 8081)
     try {
       const referrer = document.referrer;
       if (referrer && referrer.startsWith('http')) {
         const refUrl = new URL(referrer);
-        if (refUrl.pathname.includes('dashboard') || refUrl.port === '5500' || refUrl.port === '8000') {
+        if (refUrl.pathname.includes('dashboard') || refUrl.port === '8081' || refUrl.port === '5500' || refUrl.port === '8000') {
           sessionStorage.setItem('central_dashboard_url', referrer);
-          sessionStorage.setItem('central_login_url', `${refUrl.origin}/index.html`);
+          sessionStorage.setItem('central_login_url', `${refUrl.origin}/`);
         }
       }
     } catch (err) {}
@@ -244,25 +244,35 @@ function App() {
     }
   }
 
+  function obtenerHostCentral() {
+    const h = window.location.hostname;
+    if (!h || h.includes('github.io')) {
+      return '100.79.246.82';
+    }
+    return h;
+  }
+
   function volverAlDashboard() {
-    const host = window.location.hostname || '127.0.0.1';
+    const host = obtenerHostCentral();
     const guardada = sessionStorage.getItem('central_dashboard_url');
-    window.location.href = guardada || `http://${host}:5500/dashboard.html`;
+    window.location.href = guardada || `http://${host}:8081/dashboard.html`;
   }
 
   function cerrarSesion() {
+    const host = obtenerHostCentral();
+    const guardada = sessionStorage.getItem('central_login_url');
+
     sessionStorage.removeItem('access_token');
     sessionStorage.removeItem('nombre_usuario');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('usuario');
     sessionStorage.clear();
+
     setUsuarioFinal(null);
     setTokenFinal(null);
     setSesionValida(false);
 
-    const host = window.location.hostname || '127.0.0.1';
-    const guardada = sessionStorage.getItem('central_login_url');
-    const loginDestino = guardada || `http://${host}:5500/index.html`;
+    const loginDestino = guardada || `http://${host}:8081/`;
     window.location.replace(`${loginDestino}?logout=true`);
   }
 
