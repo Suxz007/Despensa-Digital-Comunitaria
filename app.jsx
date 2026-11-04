@@ -255,7 +255,15 @@ function App() {
   function volverAlDashboard() {
     const host = obtenerHostCentral();
     const guardada = sessionStorage.getItem('central_dashboard_url');
-    window.location.href = guardada || `http://${host}:8081/dashboard.html`;
+    const baseDash = guardada || `http://${host}:8081/dashboard.html`;
+    const u = usuarioFinal || sessionStorage.getItem('usuario') || sessionStorage.getItem('nombre_usuario');
+    const t = tokenFinal || sessionStorage.getItem('token') || sessionStorage.getItem('access_token');
+    if (u && t) {
+      const sep = baseDash.includes('?') ? '&' : '?';
+      window.location.href = `${baseDash}${sep}usuario=${encodeURIComponent(u)}&token=${encodeURIComponent(t)}`;
+    } else {
+      window.location.href = baseDash;
+    }
   }
 
   function cerrarSesion() {
