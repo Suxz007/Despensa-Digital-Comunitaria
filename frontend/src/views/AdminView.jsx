@@ -12,6 +12,53 @@ function AdminView({ mode, products, usuario, onNavigate, onDelete, onSaveProduc
   const [description, setDescription] = useState('');
   const [available, setAvailable] = useState(true);
   const [imageUrl, setImageUrl] = useState('');
+  const [imageFileName, setImageFileName] = useState('');
+
+  function handleImageFileChange(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    setImageFileName(file.name);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxWidth = 900;
+        const maxHeight = 900;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        setImageUrl(dataUrl);
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function eliminarImagen() {
+    setImageUrl('');
+    setImageFileName('');
+  }
 
   const filtered = products.filter(p => {
     const okQ = !query.trim() || p.name.toLowerCase().includes(query.toLowerCase());
@@ -35,6 +82,7 @@ function AdminView({ mode, products, usuario, onNavigate, onDelete, onSaveProduc
     setPrice('');
     setDescription('');
     setImageUrl('');
+    setImageFileName('');
   }
 
   return (
@@ -239,14 +287,89 @@ function AdminView({ mode, products, usuario, onNavigate, onDelete, onSaveProduc
                 </div>
 
                 <div className="form-field">
-                  <label>URL de Imagen (opcional)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="https://..."
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                  />
+                  <label>Foto del producto</label>
+                  <div style={{
+                    border: '2px dashed var(--border)',
+                    borderRadius: '10px',
+                    padding: '20px',
+                    textAlign: 'center',
+                    background: '#FAFAFA',
+                    position: 'relative'
+                  }}>
+                    {!imageUrl ? (
+                      <div>
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="1.6" style={{ margin: '0 auto 8px', display: 'block' }}>
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                          <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <label
+                          htmlFor="admin-foto-input"
+                          style={{
+                            cursor: 'pointer',
+                            display: 'inline-block',
+                            background: 'var(--green)',
+                            color: '#fff',
+                            padding: '8px 18px',
+                            borderRadius: '6px',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            marginBottom: '6px'
+                          }}
+                        >
+                          📁 Seleccionar imagen de archivo
+                        </label>
+                        <p style={{ fontSize: '12px', color: 'var(--muted)', margin: 0 }}>
+                          Acepta JPG, PNG, WEBP. Se ajusta automáticamente al tamaño del contenedor.
+                        </p>
+                        <input
+                          id="admin-foto-input"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageFileChange}
+                          style={{ display: 'none' }}
+                        />
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                        <div style={{
+                          width: '100%',
+                          maxWidth: '300px',
+                          height: '190px',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          border: '1px solid var(--border)'
+                        }}>
+                          <img
+                            src={imageUrl}
+                            alt="Vista previa"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                          />
+                        </div>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                          <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                            {imageFileName || 'Foto cargada'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={eliminarImagen}
+                            style={{
+                              background: '#FFF0F0',
+                              color: 'var(--danger)',
+                              border: '1px solid var(--danger)',
+                              borderRadius: '6px',
+                              padding: '4px 10px',
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                              fontWeight: 600
+                            }}
+                          >
+                            Quitar foto
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
