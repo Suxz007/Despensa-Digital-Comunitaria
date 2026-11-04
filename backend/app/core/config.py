@@ -1,8 +1,24 @@
 """Configuración central: todo lo que viene de variables de entorno vive aquí."""
 import os
+from pathlib import Path
 
 # backend/  (dos niveles arriba de app/core/)
 BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Cargar automáticamente variables de .env si existe
+env_path = Path(BACKEND_DIR) / ".env"
+if env_path.exists():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv(dotenv_path=env_path)
+    except ImportError:
+        # Fallback sin python-dotenv
+        for line in env_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
 
 # --- JWT ---
 JWT_SECRET = os.getenv("JWT_SECRET", "clave-solo-para-pruebas")
