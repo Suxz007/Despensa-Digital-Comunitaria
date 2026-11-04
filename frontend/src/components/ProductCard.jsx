@@ -59,3 +59,5 @@ function ProductCard({ product, onSelect, buttonColor = 'blue', showButton = tru
     </article>
   );
 }
+
+Object.assign(window, { ProductCard });

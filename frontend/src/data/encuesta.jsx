@@ -14,3 +14,5 @@ const OPCIONES_EVALUACION = [
   { valor: 2, emoji: '😬', etiqueta: 'Medio' },
   { valor: 3, emoji: '🤩', etiqueta: 'Excelente' }
 ];
+
+Object.assign(window, { PREGUNTAS_ENCUESTA, OPCIONES_EVALUACION });

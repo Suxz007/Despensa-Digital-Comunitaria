@@ -58,3 +58,5 @@ function HomeView({ featuredProducts, searchQuery, setSearchQuery, onExplore, on
     </main>
   );
 }
+
+Object.assign(window, { HomeView });

@@ -119,3 +119,5 @@ const INITIAL_CATALOG_PRODUCTS = [
 ];
 
 const CATEGORIES = ['Alimentos', 'Agricultura', 'Artesanías'];
+
+Object.assign(window, { FEATURED_PRODUCTS, INITIAL_CATALOG_PRODUCTS, CATEGORIES });

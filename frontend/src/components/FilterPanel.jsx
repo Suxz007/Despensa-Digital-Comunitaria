@@ -60,3 +60,5 @@ function FilterPanel({ selectedCats, onToggleCat, onlyAvailable, onToggleAvailab
     </div>
   );
 }
+
+Object.assign(window, { FilterPanel });

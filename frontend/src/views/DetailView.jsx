@@ -83,3 +83,5 @@ function DetailView({ product, relatedProducts, onBack, onSelectProduct }) {
     </main>
   );
 }
+
+Object.assign(window, { DetailView });

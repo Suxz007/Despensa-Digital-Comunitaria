@@ -273,3 +273,5 @@ function AdminView({ mode, products, usuario, onNavigate, onDelete, onSaveProduc
     </div>
   );
 }
+
+Object.assign(window, { AdminView });

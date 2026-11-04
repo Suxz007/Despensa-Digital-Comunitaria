@@ -262,3 +262,5 @@ function EncuestaUsabilidadView({ subproyectoId, nombreSubproyecto, onCancelar }
     </main>
   );
 }
+
+Object.assign(window, { EncuestaUsabilidadView });

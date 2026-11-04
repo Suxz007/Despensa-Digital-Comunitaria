@@ -182,3 +182,5 @@ function ProductsView({ products, searchQuery, onSelectProduct, onNavigate }) {
     </main>
   );
 }
+
+Object.assign(window, { ProductsView });

@@ -64,3 +64,5 @@ function WhatsappFab() {
   );
 }
 
+Object.assign(window, { Footer, WhatsappFab });
+

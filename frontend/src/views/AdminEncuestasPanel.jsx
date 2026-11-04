@@ -141,3 +141,5 @@ function AdminEncuestasPanel({ subproyectoId, onNavigate }) {
     </div>
   );
 }
+
+Object.assign(window, { AdminEncuestasPanel });

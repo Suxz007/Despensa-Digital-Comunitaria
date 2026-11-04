@@ -219,3 +219,5 @@ function PublicNavbar({
     </>
   );
 }
+
+Object.assign(window, { TopBanner, PublicNavbar });

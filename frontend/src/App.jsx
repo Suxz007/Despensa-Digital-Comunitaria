@@ -242,3 +242,5 @@ function App() {
     </div>
   );
 }
+
+Object.assign(window, { App });

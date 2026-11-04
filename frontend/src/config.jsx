@@ -9,3 +9,12 @@ const AUTH_API_URL = (window.location.port === '8090' || window.location.port ==
   : 'http://127.0.0.1:8000';
 const SUBPROYECTO_ID = 'despensa-digital';
 const SUBPROYECTO_NOMBRE = 'Despensa Digital Comunitaria';
+
+Object.assign(window, {
+  useState,
+  useEffect,
+  useMemo,
+  AUTH_API_URL,
+  SUBPROYECTO_ID,
+  SUBPROYECTO_NOMBRE
+});
