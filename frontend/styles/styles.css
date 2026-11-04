@@ -274,6 +274,7 @@ button, input, select, textarea {
   background: rgba(0, 0, 0, 0.45);
   z-index: 200;
   display: flex;
+  justify-content: flex-end;
 }
 
 .drawer-panel {
@@ -281,14 +282,17 @@ button, input, select, textarea {
   max-width: 82vw;
   background: #fff;
   height: 100%;
+  padding: 20px 14px;
   display: flex;
   flex-direction: column;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  gap: 6px;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
 }
 
 .drawer-header {
-  padding: 16px;
+  padding: 4px 6px 16px;
   border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -297,13 +301,14 @@ button, input, select, textarea {
 .drawer-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 20px;
-  background: none;
+  gap: 10px;
+  padding: 11px 14px;
+  background: transparent;
   border: none;
+  border-radius: 8px;
   width: 100%;
   text-align: left;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text);
   cursor: pointer;
@@ -313,6 +318,7 @@ button, input, select, textarea {
 .drawer-item.active {
   background: var(--green-soft);
   color: var(--green);
+  font-weight: 600;
 }
 
 /* ==========================================================================

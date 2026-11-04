@@ -57,31 +57,25 @@ function AdminView({ mode, products, usuario, onNavigate, onDelete, onSaveProduc
       <div className="admin-layout">
         <aside className="admin-sidebar">
           <button
-            className={`admin-nav-btn ${mode === 'admin' ? 'active' : ''}`}
-            onClick={() => onNavigate('admin')}
+            className="admin-nav-btn"
+            onClick={() => onNavigate('home')}
           >
-            📦 Lista de Productos
+            🏠 Ir a Inicio
           </button>
           <button
             className={`admin-nav-btn ${mode === 'adminNuevo' ? 'active' : ''}`}
-            onClick={() => onNavigate('adminNuevo')}
+            onClick={() => onNavigate('productos')}
           >
             ➕ Agregar Producto
           </button>
-          <button className="admin-nav-btn" onClick={() => onNavigate('productos')}>
-            🏪 Ver Catálogo
+          <button className="admin-nav-btn" onClick={() => onNavigate('encuesta')}>
+            📝 Ir a Encuesta
           </button>
           <button
             className={`admin-nav-btn ${mode === 'adminEncuestas' ? 'active' : ''}`}
             onClick={() => onNavigate('adminEncuestas')}
           >
             📊 Resultados Encuesta
-          </button>
-          <button className="admin-nav-btn" onClick={() => onNavigate('encuesta')}>
-            📝 Ir a Encuesta
-          </button>
-          <button className="admin-nav-btn" onClick={() => onNavigate('home')}>
-            🏠 Ir a Inicio
           </button>
 
           <div style={{ height: '1px', background: 'var(--border)', margin: '14px 0' }}></div>

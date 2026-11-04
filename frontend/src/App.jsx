@@ -223,7 +223,24 @@ function App() {
         </>
       )}
 
-      {(view === 'admin' || view === 'adminNuevo' || view === 'adminEncuestas') && (
+      {view === 'adminEncuestas' && (
+        <>
+          <PublicNavbar
+            active="adminEncuestas"
+            onNavigate={handleNavigate}
+            usuario={usuarioFinal}
+            onVolverDashboard={volverAlDashboard}
+            onCerrarSesion={cerrarSesion}
+          />
+          <main className="centered" style={{ flex: 1, paddingTop: '40px', paddingBottom: '64px' }}>
+            <AdminEncuestasPanel subproyectoId={SUBPROYECTO_ID} onNavigate={handleNavigate} />
+          </main>
+          <Footer onNavigate={handleNavigate} />
+          <WhatsappFab />
+        </>
+      )}
+
+      {(view === 'admin' || view === 'adminNuevo') && (
         <AdminView
           mode={view}
           products={catalogProducts}
