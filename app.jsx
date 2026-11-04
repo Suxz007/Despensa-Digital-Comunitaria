@@ -205,18 +205,6 @@ function App() {
     const usuarioUrl = params.get('usuario');
     let tokenUrl = params.get('token');
 
-    // Detectar y guardar URL del panel central o login si vino como referrer (puerto 8081)
-    try {
-      const referrer = document.referrer;
-      if (referrer && referrer.startsWith('http')) {
-        const refUrl = new URL(referrer);
-        if (refUrl.pathname.includes('dashboard') || refUrl.port === '8081' || refUrl.port === '5500' || refUrl.port === '8000') {
-          sessionStorage.setItem('central_dashboard_url', referrer);
-          sessionStorage.setItem('central_login_url', `${refUrl.origin}/`);
-        }
-      }
-    } catch (err) {}
-
     if (tokenUrl) {
       tokenUrl = tokenUrl.replace(/"/g, '').trim();
     }
@@ -244,32 +232,11 @@ function App() {
     }
   }
 
-  function obtenerHostCentral() {
-    const h = window.location.hostname;
-    if (!h || h.includes('github.io')) {
-      return '100.79.246.82';
-    }
-    return h;
-  }
-
   function volverAlDashboard() {
-    const host = obtenerHostCentral();
-    const guardada = sessionStorage.getItem('central_dashboard_url');
-    const baseDash = guardada || `http://${host}:8081/dashboard.html`;
-    const u = usuarioFinal || sessionStorage.getItem('usuario') || sessionStorage.getItem('nombre_usuario');
-    const t = tokenFinal || sessionStorage.getItem('token') || sessionStorage.getItem('access_token');
-    if (u && t) {
-      const sep = baseDash.includes('?') ? '&' : '?';
-      window.location.href = `${baseDash}${sep}usuario=${encodeURIComponent(u)}&token=${encodeURIComponent(t)}`;
-    } else {
-      window.location.href = baseDash;
-    }
+    window.location.href = 'http://100.79.246.82:8081/dashboard.html';
   }
 
   function cerrarSesion() {
-    const host = obtenerHostCentral();
-    const guardada = sessionStorage.getItem('central_login_url');
-
     sessionStorage.removeItem('access_token');
     sessionStorage.removeItem('nombre_usuario');
     sessionStorage.removeItem('token');
@@ -280,8 +247,7 @@ function App() {
     setTokenFinal(null);
     setSesionValida(false);
 
-    const loginDestino = guardada || `http://${host}:8081/`;
-    window.location.replace(`${loginDestino}?logout=true`);
+    window.location.replace('http://100.79.246.82:8081/index.html?logout=true');
   }
 
   function handleOpenDetail(product) {
