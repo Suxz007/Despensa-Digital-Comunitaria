@@ -77,7 +77,31 @@ CREATE TABLE `solicitante` (
     `nombre_completo` VARCHAR(120) NOT NULL,
     `telefono` VARCHAR(25) NOT NULL,
     `correo` VARCHAR(100) NULL,
-    `tipo_solicitante` VARCHAR(50) DEFAULT 'Comunidad Universitaria', -- 'Estudiante', 'Docente', 'Externo'
+    `tipo_solicitante` VARCHAR(50) DEFAULT 'Comunidad Universitaria',
+    `dependencia_o_rol` VARCHAR(100) NULL,
+    `activo` BOOLEAN DEFAULT TRUE,
+    `fecha_registro` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ==============================================================================
+-- 5. TABLA: encuesta_usabilidad_respuestas (Evaluación institucional de 5 preguntas)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS `encuesta_usabilidad_respuestas` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `subproyecto_id` VARCHAR(64) NOT NULL,
+    `usuario_id` VARCHAR(128) NOT NULL,
+    `version_encuesta` SMALLINT UNSIGNED NOT NULL DEFAULT 2,
+    `respuesta_1` TINYINT UNSIGNED NOT NULL,
+    `respuesta_2` TINYINT UNSIGNED NOT NULL,
+    `respuesta_3` TINYINT UNSIGNED NOT NULL,
+    `respuesta_4` TINYINT UNSIGNED NOT NULL,
+    `respuesta_5` TINYINT UNSIGNED NOT NULL,
+    `fecha_creacion` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_encuesta_usuario_subproyecto_version`
+        (`usuario_id`, `subproyecto_id`, `version_encuesta`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; -- 'Estudiante', 'Docente', 'Externo'
     `id_producto` INT NOT NULL,
     `cantidad_solicitada` INT DEFAULT 1,
     `mensaje` TEXT NULL,
