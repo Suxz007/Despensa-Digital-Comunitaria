@@ -75,7 +75,7 @@ function PublicNavbar({
               className="btn-outline-grey"
               onClick={onCerrarSesion}
               title={usuario ? `Cerrar sesión de ${usuario}` : 'Cerrar sesión'}
-              style={{ padding: '8px 12px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', color: '#d32f2f', borderColor: '#f5c2c7' }}
+              style={{ padding: '8px 12px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--danger)', borderColor: '#f5c2c7' }}
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -204,7 +204,7 @@ function PublicNavbar({
             <button
               className="drawer-item"
               onClick={() => { setDrawerOpen(false); onCerrarSesion && onCerrarSesion(); }}
-              style={{ color: '#d32f2f', fontWeight: 600 }}
+              style={{ color: 'var(--danger)', fontWeight: 600 }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '10px' }}>
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>

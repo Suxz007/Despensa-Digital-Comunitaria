@@ -17,9 +17,10 @@
   --off-fg: #842029;
   --table-head: #F1F3F5;
   --row-alt: #FAFBFB;
-  --admin-badge: #198754;
+  --admin-badge: #007A33;
   --tag-bg: #F0F8FF;
-  --danger: #DC3545;
+  --red: #E20613;
+  --danger: #E20613;
 }
 
 * {
