@@ -134,8 +134,29 @@ function App() {
     }
   }
 
+  async function handleUpdateProduct(updatedProd) {
+    setCatalogProducts(prev => prev.map(p => p.id === updatedProd.id ? { ...p, ...updatedProd } : p));
+    if (selectedProduct && selectedProduct.id === updatedProd.id) {
+      setSelectedProduct(prev => ({ ...prev, ...updatedProd }));
+    }
+
+    try {
+      const resp = await fetch(`${AUTH_API_URL}/api/productos/${updatedProd.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedProd)
+      });
+      if (resp.ok) {
+        const guardado = await resp.json();
+        setCatalogProducts(prev => prev.map(p => p.id === updatedProd.id ? { ...p, ...guardado } : p));
+      }
+    } catch (e) {
+      console.warn('Producto modificado localmente, sincronización remota pendiente:', e);
+    }
+  }
+
   async function handleDeleteProduct(id) {
-    if (window.confirm('¿Eliminar este producto de la lista?')) {
+    if (window.confirm('¿Eliminar este producto del catálogo?')) {
       setCatalogProducts(prev => prev.filter(p => p.id !== id));
       try {
         await fetch(`${AUTH_API_URL}/api/productos/${id}`, { method: 'DELETE' });
@@ -161,6 +182,9 @@ function App() {
           <HomeView
             products={catalogProducts}
             onSelectProduct={handleOpenDetail}
+            onUpdateProduct={handleUpdateProduct}
+            onDeleteProduct={handleDeleteProduct}
+            onNavigate={handleNavigate}
           />
           <Footer onNavigate={handleNavigate} />
         </>

@@ -19,7 +19,16 @@ function DetailView({ product, relatedProducts, onBack, onSelectProduct }) {
 
       <div className="detail-layout">
         <div>
-          <img className="detail-img" src={product.imageUrl} alt={product.name} />
+          <img
+            className="detail-img"
+            src={product.imageUrl || DEFAULT_PRODUCT_IMAGE}
+            alt={product.name}
+            onError={(e) => {
+              if (e.target.src !== DEFAULT_PRODUCT_IMAGE) {
+                e.target.src = DEFAULT_PRODUCT_IMAGE;
+              }
+            }}
+          />
         </div>
 
         <div className="detail-panel">

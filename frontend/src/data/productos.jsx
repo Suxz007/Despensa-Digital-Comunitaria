@@ -43,7 +43,7 @@ const FEATURED_PRODUCTS = [
     unit: '/ 500 ml',
     available: true,
     presentation: 'Frasco de Vidrio 500ml',
-    imageUrl: 'https://images.unsplash.com/photo-1587049352847-4a222e784d38?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=800&q=80',
     description: 'Miel 100% natural, recolectada de manera artesanal por estudiantes del programa de Ingeniería Agroecológica en bosques nativos del Caquetá. No contiene aditivos ni conservantes artificiales. Envase de vidrio esterilizado.'
   }
 ];

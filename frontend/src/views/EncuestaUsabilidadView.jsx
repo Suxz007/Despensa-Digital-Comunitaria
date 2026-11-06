@@ -83,9 +83,8 @@ function EncuestaUsabilidadView({ subproyectoId, nombreSubproyecto, onCancelar }
           alignItems: 'center',
           gap: '24px'
         }}>
-          <img src="assets/images/escudo_uniamazonia.png" alt="Universidad de la Amazonia" style={{ height: '60px', width: '77px', objectFit: 'contain' }} />
-          <img src="assets/images/logo_sistemas.png" alt="Programa de Ingeniería de Sistemas" style={{ height: '60px', width: '145px', objectFit: 'contain' }} />
-          <img src="assets/images/logo_red_comunitaria.jpg" alt="Red Comunitaria Uniamazonia" style={{ height: '60px', width: '62px', objectFit: 'contain' }} />
+          <img src="assets/images/escudo_uniamazonia.png" alt="Universidad de la Amazonia" style={{ height: '54px', width: 'auto', objectFit: 'contain' }} />
+          <img src="assets/images/logo_sistemas.png" alt="Programa de Ingeniería de Sistemas" style={{ height: '54px', width: 'auto', objectFit: 'contain' }} />
         </div>
 
         {enviada ? (
