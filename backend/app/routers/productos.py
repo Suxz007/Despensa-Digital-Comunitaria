@@ -18,6 +18,8 @@ def verificar_semilla_inicial_mysql(conn):
     _semilla_verificada = True
     try:
         cur = conn.cursor()
+        # Asegurar que url_imagen soporte imágenes en Base64 subidas desde archivo
+        cur.execute("ALTER TABLE producto MODIFY COLUMN url_imagen LONGTEXT NULL")
         # Corregir URL rota de Miel de Abejas Silvestre si existe
         cur.execute(
             """

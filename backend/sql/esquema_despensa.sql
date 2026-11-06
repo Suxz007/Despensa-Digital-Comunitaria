@@ -54,7 +54,7 @@ CREATE TABLE `producto` (
     `precio` DECIMAL(12, 2) NOT NULL,
     `unidad_medida` VARCHAR(30) DEFAULT 'kg', -- 'kg', 'Unidad', '500g', 'Mano', 'Panal'
     `presentacion` VARCHAR(100) NULL,
-    `url_imagen` TEXT NULL,
+    `url_imagen` LONGTEXT NULL,
     `disponible` BOOLEAN DEFAULT TRUE,
     `id_tipo_producto` INT NOT NULL,
     `id_productor` INT NOT NULL,
