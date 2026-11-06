@@ -2,11 +2,7 @@
 // COMPONENTES DE NAVEGACIÓN (CON SOPORTE RESPONSIVE DESKTOP + DRAWER MÓVIL)
 // ============================================================================
 function TopBanner() {
-  return (
-    <div className="top-banner">
-      Apoya el desarrollo local: Compra directa a productores de la Universidad de la Amazonia
-    </div>
-  );
+  return null;
 }
 
 function PublicNavbar({

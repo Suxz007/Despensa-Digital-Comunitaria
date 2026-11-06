@@ -170,7 +170,6 @@ function App() {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {view === 'home' && (
         <>
-          <TopBanner />
           <PublicNavbar
             active="home"
             isHome={true}
